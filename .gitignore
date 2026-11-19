@@ -1,14 +1,1 @@
-# GHDL / GTKWave
-tb/work/
-*.cf
-*.ghw
-*.o
-# Vivado
-vivado/proj/
-vivado/.Xil/
-vivado/*.jou
-vivado/*.log
-vivado/*.bit
-vivado/*.str
-vivado/utilizacao.txt
-semaforo_vivado.zip
+# gerados pela simulação/síntese ficam dentro de trabalho/ (ver trabalho/.gitignore)

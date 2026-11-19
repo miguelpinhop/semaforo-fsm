@@ -2,7 +2,7 @@
 # Simulação local com GHDL; síntese/gravação com Vivado (máquina Windows, ver vivado/README.md)
 TB ?= tb_semaforo
 
-.PHONY: help sim sim-all sim-gui pacote clean desinstalar-ghdl
+.PHONY: help sim sim-all sim-gui pacote clean
 
 help:
 	@echo "make sim [TB=tb_fsm_semaforo]  - simula um testbench com GHDL (padrao: tb_semaforo)"
@@ -10,7 +10,6 @@ help:
 	@echo "make sim-gui [TB=...]          - simula e abre a forma de onda no GTKWave"
 	@echo "make pacote                    - zip com src/ tb/ vivado/ para a maquina com Vivado"
 	@echo "make clean                     - remove arquivos gerados"
-	@echo "make desinstalar-ghdl          - mostra o comando para remover GHDL/GTKWave ao fim do trabalho"
 
 sim:
 	tb/run.sh $(TB)
@@ -28,5 +27,3 @@ pacote:
 clean:
 	rm -rf tb/work vivado/proj vivado/.Xil vivado/*.jou vivado/*.log vivado/*.bit vivado/utilizacao.txt semaforo_vivado.zip
 
-desinstalar-ghdl:
-	@echo "sudo apt remove --purge ghdl ghdl-common ghdl-mcode gtkwave && sudo apt autoremove"

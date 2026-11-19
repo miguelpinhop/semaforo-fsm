@@ -42,7 +42,7 @@ Observação no enunciado: "10 pontos na nota do quarto bimestre. Sendo:" termin
 |---|---|
 | **Placa alvo** | **Boolean Board** (Real Digital), Spartan-7 `xc7s50csga324-1`, clock 100 MHz no pino **F14**, 16 switches, 4 botões, 16 LEDs, 2 LEDs RGB, 2 displays de 7 seg × 4 dígitos. É isso que o link do professor descreve (manual de referência da Boolean Board). A DE0-Nano não é mais usada no laboratório (constatado no trabalho anterior, 23/10/2026) |
 | **Vivado** | Em outra máquina, **Windows**. Scripts prontos do trabalho anterior em `../trab5/sd-trab05-memoria-vhdl/vivado/` (`criar_projeto.tcl`, `gerar_bitstream.tcl`, `programar.tcl`, `vivado.bat`, `README.md`) serão copiados e adaptados. Caminho do projeto lá **sem acento nem espaço** (ex.: `C:\SEMAFORO`) |
-| **Simulador nesta máquina** | **GHDL 4.1 + GTKWave** instalados em 19/11/2026 (`make sim`, `make sim-gui`). Quartus/ModelSim do bimestre passado não existem mais. **Ao terminar o trabalho, remover** para liberar espaço: `make desinstalar-ghdl` imprime o comando (`sudo apt remove --purge ghdl ghdl-common ghdl-mcode gtkwave && sudo apt autoremove`). Na máquina com Vivado, o mesmo testbench roda no xsim |
+| **Simulador nesta máquina** | **GHDL 4.1 + GTKWave** instalados em 19/11/2026 (`make sim`, `make sim-gui`). Quartus/ModelSim do bimestre passado não existem mais. **Lembrete: ao terminar o trabalho, remover** para liberar espaço (`sudo apt remove --purge ghdl ghdl-common ghdl-mcode gtkwave && sudo apt autoremove`). Na máquina com Vivado, o mesmo testbench roda no xsim |
 | **Template da aula** | `exemplos de máquinas de estados-20261119/maquina_exemplo.vhd` (Moore) e `maquina_exemplo2.vhd` (Mealy). Detalhes em 3.2 |
 | **Pinagem** | Tabela abaixo, do tutorial "A First Vivado Project for the Boolean board" (realdigital.org), conferida com o XDC do trabalho anterior nos pinos em comum (switches, LED0–7, BTN0): batem |
 | **Referência de estilo** | `leitura_projeto RTL.pdf` (Vahid cap. 5): método em 4 passos — máquina de estados de alto nível → bloco operacional → ligar ao bloco de controle → FSM do bloco de controle. O divisor de clock (contador) é o "bloco operacional"; a FSM é o "bloco de controle" |
@@ -122,26 +122,28 @@ O que o template fixa e o `src/fsm_semaforo.vhd` copia à risca:
 ### 3.3 Arquivos
 
 ```
-semaforo/
+semaforo/                          # raiz: fontes de consulta e planejamento (não vão para a entrega)
 ├── PLAN.md
-├── semaforo.pdf, leitura_projeto RTL.pdf, DE0_Nano_User_Manual.pdf   (fontes)
-├── src/
-│   ├── divisor_clock.vhd     # 100 MHz -> 1 Hz; generic DIVISOR (default 100_000_000) p/ simular rápido
-│   ├── fsm_semaforo.vhd      # FSM centralizada (3.2); entradas clk, reset; saídas 9 bits
-│   └── semaforo.vhd          # TOPLEVEL: instancia divisor + fsm, mapeia nos LEDs
-├── tb/
-│   ├── tb_divisor_clock.vhd  # período de saída = DIVISOR ciclos; duty; reset
-│   ├── tb_fsm_semaforo.vhd   # sequência, 1 ciclo por estado, invariante R3, reset no meio
-│   ├── tb_semaforo.vhd       # integração com DIVISOR pequeno (ex.: 10)
-│   └── run.sh                # ghdl -a / -e / -r com asserts; gera .ghw
-├── vivado/
-│   ├── semaforo.xdc          # pinos (tabela em 2) + create_clock 10 ns em clk
-│   ├── criar_projeto.tcl, gerar_bitstream.tcl, programar.tcl, vivado.bat, README.md
-├── docs/
-│   ├── diagrama_estados.(svg|png)   # para o vídeo
-│   ├── roteiro_video.md             # falas, ordem, tempo
-│   └── relatorio_recursos.txt       # saída do report_utilization (opcional)
-└── Makefile                   # sim, sim-gui, pacote, clean
+├── semaforo.pdf, leitura_projeto RTL.pdf, DE0_Nano_User_Manual.pdf
+├── exemplos de máquinas de estados-20261119/   # template do professor
+└── trabalho/                      # SÓ o que é do trabalho (é o que vira o zip da entrega)
+    ├── Makefile                   # sim, sim-all, sim-gui, pacote, clean
+    ├── src/
+    │   ├── divisor_clock.vhd      # 100 MHz -> 1 Hz; generic DIVISOR p/ simular rápido
+    │   ├── fsm_semaforo.vhd       # FSM centralizada (3.2); entradas clk, reset; 9 saídas
+    │   └── semaforo.vhd           # TOPLEVEL: instancia divisor + fsm, mapeia nos LEDs
+    ├── tb/
+    │   ├── tb_divisor_clock.vhd   # período = DIVISOR ciclos; duty; reset
+    │   ├── tb_fsm_semaforo.vhd    # sequência, invariante R3, reset no meio
+    │   ├── tb_semaforo.vhd        # integração com DIVISOR = 10
+    │   └── run.sh                 # ghdl -a / -e / -r com asserts; gera .ghw em tb/work/
+    ├── vivado/
+    │   ├── semaforo.xdc           # pinos + create_clock 10 ns em clk
+    │   ├── criar_projeto.tcl, gerar_bitstream.tcl, programar.tcl, vivado.bat, README.md
+    └── docs/
+        ├── diagrama_estados.(svg|png)   # para o vídeo
+        ├── roteiro_video.md             # falas, ordem, tempo
+        └── utilizacao.txt               # report_utilization do Vivado
 ```
 
 ## 4. Fases (cada fase só avança quando o teste passa)
@@ -162,7 +164,7 @@ semaforo/
 ### Fase 3 — FSM (`src/fsm_semaforo.vhd`) ✅ 19/11/2026
 - [x] Implementada no formato do template (3.2). Cabeçalho com diagrama e tabela de saídas; cada `when` comentado.
 - [x] `tb/tb_fsm_semaforo.vhd`: (1) todos vermelhos após reset; (2) ordem RESET→A_V→A_A→B_V→B_A→C_V→C_A→A_V por três ciclos; (3) invariante a cada borda de descida: 1 luz por via e ≤ 1 via fora do vermelho; (4) reset assíncrono no meio de `S_C_VERDE` leva a `S_RESET` na hora e o ciclo recomeça por A. Passa.
-- [ ] Latches: GHDL não reclama; confirmar no relatório de síntese do Vivado (fase 5).
+- [x] Latches: `ghdl --synth` gera a netlist sem avisos e sem latch (estado em 3 bits). Confirmar de novo no relatório do Vivado (fase 5).
 
 ### Fase 4 — Toplevel (`src/semaforo.vhd`) ✅ 19/11/2026
 - [x] Portas `clk`, `reset`, `led(15 downto 0)` (nomes iguais ao XDC). `generic DIVISOR` repassado ao divisor. Instâncias `DIV` e `FSM` via `component`. LEDs 12, 11, 7, 6, 2, 1, 0 em '0'.
@@ -228,8 +230,11 @@ semaforo/
 ## 7. Como rodar
 
 ```bash
+cd trabalho
 make sim-all                 # os três testbenches (GHDL)
 make sim TB=tb_fsm_semaforo  # só um
 make sim-gui TB=tb_semaforo  # abre o GTKWave com tb/work/tb_semaforo.ghw
 make pacote                  # zip para a máquina com Vivado
 ```
+
+Página de explicação do trabalho (artifact, 19/11/2026): ver link na conversa; fonte gerada a partir dos `.vhd` reais.
